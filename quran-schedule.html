@@ -1,0 +1,1111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quran Reading Schedule</title>
+<link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=DM+Mono:wght@400;500&family=Spectral:ital,wght@0,300;0,400;0,600;1,300&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #1a1408;
+    --parchment: #f5efe0;
+    --gold: #b8963e;
+    --gold-light: #d4ae5e;
+    --gold-pale: #f0e4c0;
+    --teal: #2a5c5c;
+    --teal-light: #3d7a7a;
+    --teal-pale: #e8f2f2;
+    --done-bg: #e8f5e9;
+    --done-text: #2e7d32;
+    --border: #d4c49a;
+    --muted: #7a6a48;
+    --shadow: rgba(26, 20, 8, 0.12);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--parchment);
+    color: var(--ink);
+    font-family: 'Spectral', Georgia, serif;
+    min-height: 100vh;
+    background-image:
+      radial-gradient(ellipse at 20% 0%, rgba(184,150,62,0.08) 0%, transparent 60%),
+      radial-gradient(ellipse at 80% 100%, rgba(42,92,92,0.06) 0%, transparent 60%);
+  }
+
+  /* HEADER */
+  header {
+    text-align: center;
+    padding: 2.5rem 1.5rem 1.5rem;
+    border-bottom: 1px solid var(--border);
+    position: relative;
+    background: linear-gradient(180deg, rgba(184,150,62,0.06) 0%, transparent 100%);
+  }
+
+  .bismillah {
+    font-family: 'Amiri', serif;
+    font-size: 1.8rem;
+    color: var(--gold);
+    letter-spacing: 0.02em;
+    margin-bottom: 0.75rem;
+    display: block;
+  }
+
+  header h1 {
+    font-family: 'Spectral', serif;
+    font-weight: 300;
+    font-size: 1.5rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--teal);
+    margin-bottom: 0.25rem;
+  }
+
+  header p.subtitle {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.7rem;
+    color: var(--muted);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  /* NAV */
+  .nav-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.85rem 1.25rem;
+    background: var(--teal);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    gap: 0.5rem;
+  }
+
+  .nav-btn {
+    background: rgba(255,255,255,0.12);
+    border: 1px solid rgba(255,255,255,0.2);
+    color: #fff;
+    padding: 0.35rem 0.65rem;
+    border-radius: 4px;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.08em;
+    cursor: pointer;
+    transition: background 0.2s;
+    white-space: nowrap;
+  }
+  .nav-btn:hover { background: rgba(255,255,255,0.22); }
+  .nav-btn.active {
+    background: var(--gold);
+    border-color: var(--gold);
+    color: var(--ink);
+    font-weight: 500;
+  }
+
+  .today-btn {
+    background: var(--gold);
+    border: none;
+    color: var(--ink);
+    padding: 0.4rem 0.85rem;
+    border-radius: 4px;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.08em;
+    cursor: pointer;
+    font-weight: 500;
+    transition: background 0.2s;
+  }
+  .today-btn:hover { background: var(--gold-light); }
+
+  .week-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    color: rgba(255,255,255,0.7);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    text-align: center;
+    flex: 1;
+  }
+
+  /* PROGRESS BAR */
+  .progress-wrap {
+    padding: 0.8rem 1.25rem;
+    background: rgba(42,92,92,0.04);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .progress-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 0.4rem;
+  }
+
+  .progress-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.62rem;
+    color: var(--muted);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .progress-count {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.62rem;
+    color: var(--teal);
+    font-weight: 500;
+  }
+
+  .progress-track {
+    height: 4px;
+    background: var(--border);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--teal), var(--gold));
+    border-radius: 2px;
+    transition: width 0.4s ease;
+  }
+
+  /* WEEK VIEW */
+  .week-container {
+    padding: 1rem 1rem 5rem;
+    max-width: 480px;
+    margin: 0 auto;
+  }
+
+  .week-header {
+    text-align: center;
+    margin-bottom: 1.25rem;
+    padding: 0.75rem 0;
+  }
+
+  .week-title {
+    font-family: 'Spectral', serif;
+    font-weight: 600;
+    font-size: 1.1rem;
+    color: var(--teal);
+    margin-bottom: 0.2rem;
+  }
+
+  .quarter-badge {
+    display: inline-block;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.6rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--gold);
+    border: 1px solid var(--gold-pale);
+    background: rgba(184,150,62,0.07);
+    padding: 0.2rem 0.5rem;
+    border-radius: 20px;
+  }
+
+  /* DAY CARD */
+  .day-card {
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    margin-bottom: 0.85rem;
+    overflow: hidden;
+    box-shadow: 0 1px 4px var(--shadow);
+    transition: box-shadow 0.2s;
+  }
+  .day-card:hover { box-shadow: 0 3px 10px var(--shadow); }
+  .day-card.is-today { border-color: var(--teal); border-width: 2px; }
+  .day-card.all-done {
+    background: linear-gradient(135deg, #f8fff8 0%, #fff 100%);
+    border-color: #a5d6a7;
+  }
+
+  .day-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    padding: 0.75rem 1rem 0.6rem;
+    border-bottom: 1px solid rgba(212,196,154,0.4);
+    gap: 0.75rem;
+  }
+
+  .day-meta {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .day-name-row {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    margin-bottom: 0.2rem;
+  }
+
+  .today-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--teal);
+    flex-shrink: 0;
+  }
+
+  .day-name {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .day-card.is-today .day-name { color: var(--teal); }
+
+  .lesson-num {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.6rem;
+    color: var(--gold);
+    letter-spacing: 0.06em;
+  }
+
+  .reading-portion {
+    font-family: 'Spectral', serif;
+    font-style: italic;
+    font-size: 0.9rem;
+    color: var(--ink);
+    line-height: 1.3;
+  }
+
+  .done-badge {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.55rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--done-text);
+    background: var(--done-bg);
+    border: 1px solid #a5d6a7;
+    padding: 0.2rem 0.45rem;
+    border-radius: 20px;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  /* TASKS */
+  .tasks {
+    padding: 0.5rem 0.75rem 0.65rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+  }
+
+  .task-row {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    padding: 0.45rem 0.5rem;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background 0.15s;
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
+  }
+  .task-row:hover { background: rgba(42,92,92,0.05); }
+  .task-row:active { background: rgba(42,92,92,0.1); }
+
+  .task-check {
+    width: 18px;
+    height: 18px;
+    border: 2px solid var(--border);
+    border-radius: 4px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    background: #fff;
+  }
+
+  .task-row.checked .task-check {
+    background: var(--teal);
+    border-color: var(--teal);
+  }
+
+  .check-icon {
+    display: none;
+    width: 10px;
+    height: 10px;
+  }
+  .task-row.checked .check-icon { display: block; }
+
+  .task-icon {
+    font-size: 0.85rem;
+    flex-shrink: 0;
+    width: 18px;
+    text-align: center;
+  }
+
+  .task-label {
+    font-family: 'Spectral', serif;
+    font-size: 0.82rem;
+    color: var(--ink);
+    flex: 1;
+    transition: color 0.2s;
+  }
+  .task-row.checked .task-label {
+    color: var(--muted);
+    text-decoration: line-through;
+    text-decoration-color: var(--border);
+  }
+
+  /* MINI TASK DOTS */
+  .task-dots {
+    display: flex;
+    gap: 3px;
+    flex-shrink: 0;
+  }
+  .task-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--border);
+    transition: background 0.2s;
+  }
+  .task-dot.filled { background: var(--teal); }
+
+  /* FLOATING TODAY */
+  .float-today {
+    position: fixed;
+    bottom: 1.25rem;
+    right: 1.25rem;
+    background: var(--teal);
+    color: #fff;
+    border: none;
+    border-radius: 50px;
+    padding: 0.6rem 1.1rem;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    cursor: pointer;
+    box-shadow: 0 4px 16px rgba(42,92,92,0.35);
+    transition: all 0.2s;
+    display: none;
+  }
+  .float-today:hover {
+    background: var(--teal-light);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(42,92,92,0.4);
+  }
+  .float-today.visible { display: block; }
+
+  /* EID BREAK */
+  .eid-break {
+    background: linear-gradient(135deg, rgba(184,150,62,0.1), rgba(42,92,92,0.08));
+    border: 1px dashed var(--gold);
+    border-radius: 8px;
+    padding: 1.1rem;
+    text-align: center;
+    margin-bottom: 0.85rem;
+  }
+  .eid-break h3 {
+    font-family: 'Amiri', serif;
+    font-size: 1.1rem;
+    color: var(--gold);
+    margin-bottom: 0.2rem;
+  }
+  .eid-break p {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.62rem;
+    color: var(--muted);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  /* SCROLLED INDICATOR */
+  .scroll-top {
+    position: fixed;
+    bottom: 1.25rem;
+    left: 1.25rem;
+    background: rgba(26,20,8,0.7);
+    color: #fff;
+    border: none;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    font-size: 0.9rem;
+    cursor: pointer;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(4px);
+    transition: opacity 0.2s;
+  }
+  .scroll-top.visible { display: flex; }
+
+  @media (max-width: 360px) {
+    .reading-portion { font-size: 0.82rem; }
+    .task-label { font-size: 0.78rem; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <span class="bismillah">بِسْمِ اللَّهِ الرَّحْمَنِ الرَّحِيمِ</span>
+  <h1>Quran Reading Schedule</h1>
+  <p class="subtitle">Shawwal to Sha'ban · 2026–2027</p>
+</header>
+
+<div class="nav-bar">
+  <button class="nav-btn" id="prevBtn" onclick="changeWeek(-1)">← Prev</button>
+  <div>
+    <div class="week-label" id="weekLabel">Week 1</div>
+  </div>
+  <button class="nav-btn" id="nextBtn" onclick="changeWeek(1)">Next →</button>
+</div>
+
+<div class="progress-wrap">
+  <div class="progress-row">
+    <span class="progress-label">Overall Progress</span>
+    <span class="progress-count" id="progressCount">0 / 924 tasks</span>
+  </div>
+  <div class="progress-track">
+    <div class="progress-fill" id="progressFill" style="width:0%"></div>
+  </div>
+</div>
+
+<div class="week-container" id="weekContainer"></div>
+
+<button class="float-today" id="floatToday" onclick="goToToday()">↓ Today</button>
+<button class="scroll-top" id="scrollTop" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
+
+<script>
+// ─── SCHEDULE DATA ────────────────────────────────────────────────────────────
+const SCHEDULE = [
+  // WEEK 1 — Q1
+  { lesson:1,  date:'2026-03-29', day:'Sunday',    portion:'Surah al-Fatihah' },
+  { lesson:2,  date:'2026-03-30', day:'Monday',    portion:'Surah al-Baqarah 1–20' },
+  { lesson:3,  date:'2026-03-31', day:'Tuesday',   portion:'Surah al-Baqarah 21–29' },
+  { lesson:4,  date:'2026-04-01', day:'Wednesday', portion:'Surah al-Baqarah 30–39' },
+  { lesson:5,  date:'2026-04-02', day:'Thursday',  portion:'Surah al-Baqarah 40–46' },
+  { lesson:6,  date:'2026-04-03', day:'Friday',    portion:'Surah al-Baqarah 47–57' },
+  { lesson:7,  date:'2026-04-04', day:'Saturday',  portion:'Surah al-Baqarah 58–66' },
+  // WEEK 2
+  { lesson:8,  date:'2026-04-05', day:'Sunday',    portion:'Surah al-Baqarah 67–74' },
+  { lesson:9,  date:'2026-04-06', day:'Monday',    portion:'Surah al-Baqarah 75–86' },
+  { lesson:10, date:'2026-04-07', day:'Tuesday',   portion:'Surah al-Baqarah 87–96' },
+  { lesson:11, date:'2026-04-08', day:'Wednesday', portion:'Surah al-Baqarah 97–103' },
+  { lesson:12, date:'2026-04-09', day:'Thursday',  portion:'Surah al-Baqarah 104–113' },
+  { lesson:13, date:'2026-04-10', day:'Friday',    portion:'Surah al-Baqarah 114–123' },
+  { lesson:14, date:'2026-04-11', day:'Saturday',  portion:'Surah al-Baqarah 124–129' },
+  // WEEK 3
+  { lesson:15, date:'2026-04-12', day:'Sunday',    portion:'Surah al-Baqarah 130–141' },
+  { lesson:16, date:'2026-04-13', day:'Monday',    portion:'Surah al-Baqarah 142–157' },
+  { lesson:17, date:'2026-04-14', day:'Tuesday',   portion:'Surah al-Baqarah 158–167' },
+  { lesson:18, date:'2026-04-15', day:'Wednesday', portion:'Surah al-Baqarah 168–176' },
+  { lesson:19, date:'2026-04-16', day:'Thursday',  portion:'Surah al-Baqarah 177–182' },
+  { lesson:20, date:'2026-04-17', day:'Friday',    portion:'Surah al-Baqarah 183–188' },
+  { lesson:21, date:'2026-04-18', day:'Saturday',  portion:'Surah al-Baqarah 189–195' },
+  // WEEK 4
+  { lesson:22, date:'2026-04-19', day:'Sunday',    portion:'Surah al-Baqarah 196–203' },
+  { lesson:23, date:'2026-04-20', day:'Monday',    portion:'Surah al-Baqarah 204–214' },
+  { lesson:24, date:'2026-04-21', day:'Tuesday',   portion:'Surah al-Baqarah 215–220' },
+  { lesson:25, date:'2026-04-22', day:'Wednesday', portion:'Surah al-Baqarah 221–227' },
+  { lesson:26, date:'2026-04-23', day:'Thursday',  portion:'Surah al-Baqarah 228–233' },
+  { lesson:27, date:'2026-04-24', day:'Friday',    portion:'Surah al-Baqarah 234–242' },
+  { lesson:28, date:'2026-04-25', day:'Saturday',  portion:'Surah al-Baqarah 243–252' },
+  // WEEK 5
+  { lesson:29, date:'2026-04-26', day:'Sunday',    portion:'Surah al-Baqarah 253–257' },
+  { lesson:30, date:'2026-04-27', day:'Monday',    portion:'Surah al-Baqarah 258–260' },
+  { lesson:31, date:'2026-04-28', day:'Tuesday',   portion:'Surah al-Baqarah 261–266' },
+  { lesson:32, date:'2026-04-29', day:'Wednesday', portion:'Surah al-Baqarah 267–274' },
+  { lesson:33, date:'2026-04-30', day:'Thursday',  portion:'Surah al-Baqarah 275–281' },
+  { lesson:34, date:'2026-05-01', day:'Friday',    portion:'Surah al-Baqarah 282–283' },
+  { lesson:35, date:'2026-05-02', day:'Saturday',  portion:'Surah al-Baqarah 284–286' },
+  // WEEK 6
+  { lesson:36, date:'2026-05-03', day:'Sunday',    portion:"Surah Aal 'Imran 1–9" },
+  { lesson:37, date:'2026-05-04', day:'Monday',    portion:"Surah Aal 'Imran 10–17" },
+  { lesson:38, date:'2026-05-05', day:'Tuesday',   portion:"Surah Aal 'Imran 18–32" },
+  { lesson:39, date:'2026-05-06', day:'Wednesday', portion:"Surah Aal 'Imran 33–41" },
+  { lesson:40, date:'2026-05-07', day:'Thursday',  portion:"Surah Aal 'Imran 42–51" },
+  { lesson:41, date:'2026-05-08', day:'Friday',    portion:"Surah Aal 'Imran 52–68" },
+  { lesson:42, date:'2026-05-09', day:'Saturday',  portion:"Surah Aal 'Imran 69–80" },
+  // WEEK 7
+  { lesson:43, date:'2026-05-10', day:'Sunday',    portion:"Surah Aal 'Imran 81–91" },
+  { lesson:44, date:'2026-05-11', day:'Monday',    portion:"Surah Aal 'Imran 92–109" },
+  { lesson:45, date:'2026-05-12', day:'Tuesday',   portion:"Surah Aal 'Imran 110–120" },
+  { lesson:46, date:'2026-05-13', day:'Wednesday', portion:"Surah Aal 'Imran 121–136" },
+  { lesson:47, date:'2026-05-14', day:'Thursday',  portion:"Surah Aal 'Imran 137–148" },
+  { lesson:48, date:'2026-05-15', day:'Friday',    portion:"Surah Aal 'Imran 149–155" },
+  { lesson:49, date:'2026-05-16', day:'Saturday',  portion:"Surah Aal 'Imran 156–175" },
+  // WEEK 8
+  { lesson:50, date:'2026-05-17', day:'Sunday',    portion:"Surah Aal 'Imran 176–189" },
+  { lesson:51, date:'2026-05-18', day:'Monday',    portion:"Surah Aal 'Imran 190–200" },
+  { lesson:52, date:'2026-05-19', day:'Tuesday',   portion:"Surah al-Nisa' 1–10" },
+  { lesson:53, date:'2026-05-20', day:'Wednesday', portion:"Surah al-Nisa' 11–14" },
+  { lesson:54, date:'2026-05-21', day:'Thursday',  portion:"Surah al-Nisa' 15–21" },
+  { lesson:55, date:'2026-05-22', day:'Friday',    portion:"Surah al-Nisa' 22–28" },
+  { lesson:56, date:'2026-05-23', day:'Saturday',  portion:"Surah al-Nisa' 29–35" },
+  // WEEK 9 — EID BREAK (no lessons)
+  // WEEK 10
+  { lesson:57, date:'2026-05-31', day:'Sunday',    portion:"Surah al-Nisa' 36–42" },
+  { lesson:58, date:'2026-06-01', day:'Monday',    portion:"Surah al-Nisa' 43–57" },
+  { lesson:59, date:'2026-06-02', day:'Tuesday',   portion:"Surah al-Nisa' 58–70" },
+  { lesson:60, date:'2026-06-03', day:'Wednesday', portion:"Surah al-Nisa' 71–79" },
+  { lesson:61, date:'2026-06-04', day:'Thursday',  portion:"Surah al-Nisa' 80–87" },
+  { lesson:62, date:'2026-06-05', day:'Friday',    portion:"Surah al-Nisa' 88–93" },
+  { lesson:63, date:'2026-06-06', day:'Saturday',  portion:"Surah al-Nisa' 94–100" },
+  // WEEK 11
+  { lesson:64, date:'2026-06-07', day:'Sunday',    portion:"Surah al-Nisa' 101–104" },
+  { lesson:65, date:'2026-06-08', day:'Monday',    portion:"Surah al-Nisa' 105–115" },
+  { lesson:66, date:'2026-06-09', day:'Tuesday',   portion:"Surah al-Nisa' 116–126" },
+  { lesson:67, date:'2026-06-10', day:'Wednesday', portion:"Surah al-Nisa' 127–135" },
+  { lesson:68, date:'2026-06-11', day:'Thursday',  portion:"Surah al-Nisa' 136–147" },
+  { lesson:69, date:'2026-06-12', day:'Friday',    portion:"Surah al-Nisa' 148–162" },
+  { lesson:70, date:'2026-06-13', day:'Saturday',  portion:"Surah al-Nisa' 163–170" },
+  // WEEK 12
+  { lesson:71, date:'2026-06-14', day:'Sunday',    portion:"Surah al-Nisa' 171–176" },
+  { lesson:72, date:'2026-06-15', day:'Monday',    portion:"Surah al-Ma'idah 1–5" },
+  { lesson:73, date:'2026-06-16', day:'Tuesday',   portion:"Surah al-Ma'idah 6–11" },
+  { lesson:74, date:'2026-06-17', day:'Wednesday', portion:"Surah al-Ma'idah 12–19" },
+  { lesson:75, date:'2026-06-18', day:'Thursday',  portion:"Surah al-Ma'idah 20–26" },
+  { lesson:76, date:'2026-06-19', day:'Friday',    portion:"Surah al-Ma'idah 27–40" },
+  { lesson:77, date:'2026-06-20', day:'Saturday',  portion:"Surah al-Ma'idah 41–50" },
+  // WEEK 13 — Q2
+  { lesson:78, date:'2026-06-21', day:'Sunday',    portion:"Surah al-Ma'idah 51–66" },
+  { lesson:79, date:'2026-06-22', day:'Monday',    portion:"Surah al-Ma'idah 67–86" },
+  { lesson:80, date:'2026-06-23', day:'Tuesday',   portion:"Surah al-Ma'idah 87–93" },
+  { lesson:81, date:'2026-06-24', day:'Wednesday', portion:"Surah al-Ma'idah 94–100" },
+  { lesson:82, date:'2026-06-25', day:'Thursday',  portion:"Surah al-Ma'idah 101–108" },
+  { lesson:83, date:'2026-06-26', day:'Friday',    portion:"Surah al-Ma'idah 109–120" },
+  { lesson:84, date:'2026-06-27', day:'Saturday',  portion:"Surah al-An'am 1–21" },
+  // WEEK 14
+  { lesson:85, date:'2026-06-28', day:'Sunday',    portion:"Surah al-An'am 22–41" },
+  { lesson:86, date:'2026-06-29', day:'Monday',    portion:"Surah al-An'am 42–55" },
+  { lesson:87, date:'2026-06-30', day:'Tuesday',   portion:"Surah al-An'am 56–73" },
+  { lesson:88, date:'2026-07-01', day:'Wednesday', portion:"Surah al-An'am 74–90" },
+  { lesson:89, date:'2026-07-02', day:'Thursday',  portion:"Surah al-An'am 91–94" },
+  { lesson:90, date:'2026-07-03', day:'Friday',    portion:"Surah al-An'am 95–111" },
+  { lesson:91, date:'2026-07-04', day:'Saturday',  portion:"Surah al-An'am 112–135" },
+  // WEEK 15
+  { lesson:92, date:'2026-07-05', day:'Sunday',    portion:"Surah al-An'am 136–145" },
+  { lesson:93, date:'2026-07-06', day:'Monday',    portion:"Surah al-An'am 146–153" },
+  { lesson:94, date:'2026-07-07', day:'Tuesday',   portion:"Surah al-An'am 154–165" },
+  { lesson:95, date:'2026-07-08', day:'Wednesday', portion:"Surah al-A'raf 1–25" },
+  { lesson:96, date:'2026-07-09', day:'Thursday',  portion:"Surah al-A'raf 26–43" },
+  { lesson:97, date:'2026-07-10', day:'Friday',    portion:"Surah al-A'raf 44–53" },
+  { lesson:98, date:'2026-07-11', day:'Saturday',  portion:"Surah al-A'raf 54–58" },
+  // WEEK 16
+  { lesson:99,  date:'2026-07-12', day:'Sunday',    portion:"Surah al-A'raf 59–84" },
+  { lesson:100, date:'2026-07-13', day:'Monday',    portion:"Surah al-A'raf 85–103" },
+  { lesson:101, date:'2026-07-14', day:'Tuesday',   portion:"Surah al-A'raf 104–126" },
+  { lesson:102, date:'2026-07-15', day:'Wednesday', portion:"Surah al-A'raf 127–141" },
+  { lesson:103, date:'2026-07-16', day:'Thursday',  portion:"Surah al-A'raf 142–154" },
+  { lesson:104, date:'2026-07-17', day:'Friday',    portion:"Surah al-A'raf 155–162" },
+  { lesson:105, date:'2026-07-18', day:'Saturday',  portion:"Surah al-A'raf 163–171" },
+  // WEEK 17
+  { lesson:106, date:'2026-07-19', day:'Sunday',    portion:"Surah al-A'raf 172–186" },
+  { lesson:107, date:'2026-07-20', day:'Monday',    portion:"Surah al-A'raf 187–206" },
+  { lesson:108, date:'2026-07-21', day:'Tuesday',   portion:"Surah al-Anfal 1–19" },
+  { lesson:109, date:'2026-07-22', day:'Wednesday', portion:"Surah al-Anfal 20–40" },
+  { lesson:110, date:'2026-07-23', day:'Thursday',  portion:"Surah al-Anfal 41–54" },
+  { lesson:111, date:'2026-07-24', day:'Friday',    portion:"Surah al-Anfal 55–66" },
+  { lesson:112, date:'2026-07-25', day:'Saturday',  portion:"Surah al-Anfal 67–75" },
+  // WEEK 18
+  { lesson:113, date:'2026-07-26', day:'Sunday',    portion:"Surah al-Tawbah 1–16" },
+  { lesson:114, date:'2026-07-27', day:'Monday',    portion:"Surah al-Tawbah 17–27" },
+  { lesson:115, date:'2026-07-28', day:'Tuesday',   portion:"Surah al-Tawbah 28–37" },
+  { lesson:116, date:'2026-07-29', day:'Wednesday', portion:"Surah al-Tawbah 38–57" },
+  { lesson:117, date:'2026-07-30', day:'Thursday',  portion:"Surah al-Tawbah 58–72" },
+  { lesson:118, date:'2026-07-31', day:'Friday',    portion:"Surah al-Tawbah 73–89" },
+  { lesson:119, date:'2026-08-01', day:'Saturday',  portion:"Surah al-Tawbah 90–100" },
+  // WEEK 19
+  { lesson:120, date:'2026-08-02', day:'Sunday',    portion:"Surah al-Tawbah 101–110" },
+  { lesson:121, date:'2026-08-03', day:'Monday',    portion:"Surah al-Tawbah 111–119" },
+  { lesson:122, date:'2026-08-04', day:'Tuesday',   portion:"Surah al-Tawbah 120–129" },
+  { lesson:123, date:'2026-08-05', day:'Wednesday', portion:"Surah Yunus 1–17" },
+  { lesson:124, date:'2026-08-06', day:'Thursday',  portion:"Surah Yunus 18–36" },
+  { lesson:125, date:'2026-08-07', day:'Friday',    portion:"Surah Yunus 37–56" },
+  { lesson:126, date:'2026-08-08', day:'Saturday',  portion:"Surah Yunus 57–70" },
+  // WEEK 20
+  { lesson:127, date:'2026-08-09', day:'Sunday',    portion:"Surah Yunus 71–92" },
+  { lesson:128, date:'2026-08-10', day:'Monday',    portion:"Surah Yunus 93–109" },
+  { lesson:129, date:'2026-08-11', day:'Tuesday',   portion:"Surah Hud 1–24" },
+  { lesson:130, date:'2026-08-12', day:'Wednesday', portion:"Surah Hud 25–49" },
+  { lesson:131, date:'2026-08-13', day:'Thursday',  portion:"Surah Hud 50–68" },
+  { lesson:132, date:'2026-08-14', day:'Friday',    portion:"Surah Hud 69–83" },
+  { lesson:133, date:'2026-08-15', day:'Saturday',  portion:"Surah Hud 84–95" },
+  // WEEK 21
+  { lesson:134, date:'2026-08-16', day:'Sunday',    portion:"Surah Hud 96–123" },
+  { lesson:135, date:'2026-08-17', day:'Monday',    portion:"Surah Yusuf 1–21" },
+  { lesson:136, date:'2026-08-18', day:'Tuesday',   portion:"Surah Yusuf 22–57" },
+  { lesson:137, date:'2026-08-19', day:'Wednesday', portion:"Surah Yusuf 58–87" },
+  { lesson:138, date:'2026-08-20', day:'Thursday',  portion:"Surah Yusuf 88–111" },
+  { lesson:139, date:'2026-08-21', day:'Friday',    portion:"Surah al-Ra'd 1–18" },
+  { lesson:140, date:'2026-08-22', day:'Saturday',  portion:"Surah al-Ra'd 19–43" },
+  // WEEK 22
+  { lesson:141, date:'2026-08-23', day:'Sunday',    portion:"Surah Ibrahim 1–23" },
+  { lesson:142, date:'2026-08-24', day:'Monday',    portion:"Surah Ibrahim 24–52" },
+  { lesson:143, date:'2026-08-25', day:'Tuesday',   portion:"Surah al-Hijr 1–48" },
+  { lesson:144, date:'2026-08-26', day:'Wednesday', portion:"Surah al-Hijr 49–99" },
+  { lesson:145, date:'2026-08-27', day:'Thursday',  portion:"Surah al-Nahl 1–34" },
+  { lesson:146, date:'2026-08-28', day:'Friday',    portion:"Surah al-Nahl 35–64" },
+  { lesson:147, date:'2026-08-29', day:'Saturday',  portion:"Surah al-Nahl 65–83" },
+  // WEEK 23
+  { lesson:148, date:'2026-08-30', day:'Sunday',    portion:"Surah al-Nahl 84–97" },
+  { lesson:149, date:'2026-08-31', day:'Monday',    portion:"Surah al-Nahl 98–111" },
+  { lesson:150, date:'2026-09-01', day:'Tuesday',   portion:"Surah al-Nahl 112–128" },
+  { lesson:151, date:'2026-09-02', day:'Wednesday', portion:"Surah al-Isra' 1–21" },
+  { lesson:152, date:'2026-09-03', day:'Thursday',  portion:"Surah al-Isra' 22–44" },
+  { lesson:153, date:'2026-09-04', day:'Friday',    portion:"Surah al-Isra' 45–60" },
+  { lesson:154, date:'2026-09-05', day:'Saturday',  portion:"Surah al-Isra' 61–88" },
+  // WEEK 24 — Q3
+  { lesson:155, date:'2026-09-06', day:'Sunday',    portion:"Surah al-Isra' 89–111" },
+  { lesson:156, date:'2026-09-07', day:'Monday',    portion:"Surah al-Kahf 1–26" },
+  { lesson:157, date:'2026-09-08', day:'Tuesday',   portion:"Surah al-Kahf 27–49" },
+  { lesson:158, date:'2026-09-09', day:'Wednesday', portion:"Surah al-Kahf 50–59" },
+  { lesson:159, date:'2026-09-10', day:'Thursday',  portion:"Surah al-Kahf 60–82" },
+  { lesson:160, date:'2026-09-11', day:'Friday',    portion:"Surah al-Kahf 83–110" },
+  { lesson:161, date:'2026-09-12', day:'Saturday',  portion:"Surah Maryam 1–15" },
+  // WEEK 25
+  { lesson:162, date:'2026-09-13', day:'Sunday',    portion:"Surah Maryam 16–40" },
+  { lesson:163, date:'2026-09-14', day:'Monday',    portion:"Surah Maryam 41–65" },
+  { lesson:164, date:'2026-09-15', day:'Tuesday',   portion:"Surah Maryam 66–98" },
+  { lesson:165, date:'2026-09-16', day:'Wednesday', portion:"Surah Taha 1–55" },
+  { lesson:166, date:'2026-09-17', day:'Thursday',  portion:"Surah Taha 56–76" },
+  { lesson:167, date:'2026-09-18', day:'Friday',    portion:"Surah Taha 77–98" },
+  { lesson:168, date:'2026-09-19', day:'Saturday',  portion:"Surah Taha 99–114" },
+  // WEEK 26
+  { lesson:169, date:'2026-09-20', day:'Sunday',    portion:"Surah Taha 115–135" },
+  { lesson:170, date:'2026-09-21', day:'Monday',    portion:"Surah al-Anbiya' 1–29" },
+  { lesson:171, date:'2026-09-22', day:'Tuesday',   portion:"Surah al-Anbiya' 30–47" },
+  { lesson:172, date:'2026-09-23', day:'Wednesday', portion:"Surah al-Anbiya' 48–77" },
+  { lesson:173, date:'2026-09-24', day:'Thursday',  portion:"Surah al-Anbiya' 78–94" },
+  { lesson:174, date:'2026-09-25', day:'Friday',    portion:"Surah al-Anbiya' 95–112" },
+  { lesson:175, date:'2026-09-26', day:'Saturday',  portion:"Surah al-Hajj 1–10" },
+  // WEEK 27
+  { lesson:176, date:'2026-09-27', day:'Sunday',    portion:"Surah al-Hajj 11–24" },
+  { lesson:177, date:'2026-09-28', day:'Monday',    portion:"Surah al-Hajj 25–37" },
+  { lesson:178, date:'2026-09-29', day:'Tuesday',   portion:"Surah al-Hajj 38–62" },
+  { lesson:179, date:'2026-09-30', day:'Wednesday', portion:"Surah al-Hajj 63–78" },
+  { lesson:180, date:'2026-10-01', day:'Thursday',  portion:"Surah al-Mu'minoon 1–22" },
+  { lesson:181, date:'2026-10-02', day:'Friday',    portion:"Surah al-Mu'minoon 23–44" },
+  { lesson:182, date:'2026-10-03', day:'Saturday',  portion:"Surah al-Mu'minoon 45–77" },
+  // WEEK 28
+  { lesson:183, date:'2026-10-04', day:'Sunday',    portion:"Surah al-Mu'minoon 78–118" },
+  { lesson:184, date:'2026-10-05', day:'Monday',    portion:"Surah al-Nur 1–10" },
+  { lesson:185, date:'2026-10-06', day:'Tuesday',   portion:"Surah al-Nur 11–26" },
+  { lesson:186, date:'2026-10-07', day:'Wednesday', portion:"Surah al-Nur 27–34" },
+  { lesson:187, date:'2026-10-08', day:'Thursday',  portion:"Surah al-Nur 35–42" },
+  { lesson:188, date:'2026-10-09', day:'Friday',    portion:"Surah al-Nur 43–57" },
+  { lesson:189, date:'2026-10-10', day:'Saturday',  portion:"Surah al-Nur 58–62" },
+  // WEEK 29
+  { lesson:190, date:'2026-10-11', day:'Sunday',    portion:"Surah al-Furqan 1–34" },
+  { lesson:191, date:'2026-10-12', day:'Monday',    portion:"Surah al-Furqan 35–60" },
+  { lesson:192, date:'2026-10-13', day:'Tuesday',   portion:"Surah al-Furqan 61–77" },
+  { lesson:193, date:'2026-10-14', day:'Wednesday', portion:"Surah al-Shu'ara' 1–68" },
+  { lesson:194, date:'2026-10-15', day:'Thursday',  portion:"Surah al-Shu'ara' 69–104" },
+  { lesson:195, date:'2026-10-16', day:'Friday',    portion:"Surah al-Shu'ara' 105–191" },
+  { lesson:196, date:'2026-10-17', day:'Saturday',  portion:"Surah al-Shu'ara' 192–227" },
+  // WEEK 30
+  { lesson:197, date:'2026-10-18', day:'Sunday',    portion:"Surah al-Naml 1–14" },
+  { lesson:198, date:'2026-10-19', day:'Monday',    portion:"Surah al-Naml 15–44" },
+  { lesson:199, date:'2026-10-20', day:'Tuesday',   portion:"Surah al-Naml 45–66" },
+  { lesson:200, date:'2026-10-21', day:'Wednesday', portion:"Surah al-Naml 67–93" },
+  { lesson:201, date:'2026-10-22', day:'Thursday',  portion:"Surah al-Qasas 1–13" },
+  { lesson:202, date:'2026-10-23', day:'Friday',    portion:"Surah al-Qasas 14–28" },
+  { lesson:203, date:'2026-10-24', day:'Saturday',  portion:"Surah al-Qasas 29–42" },
+  // WEEK 31
+  { lesson:204, date:'2026-10-25', day:'Sunday',    portion:"Surah al-Qasas 43–55" },
+  { lesson:205, date:'2026-10-26', day:'Monday',    portion:"Surah al-Qasas 56–75" },
+  { lesson:206, date:'2026-10-27', day:'Tuesday',   portion:"Surah al-Qasas 76–88" },
+  { lesson:207, date:'2026-10-28', day:'Wednesday', portion:"Surah al-'Ankabut 1–13" },
+  { lesson:208, date:'2026-10-29', day:'Thursday',  portion:"Surah al-'Ankabut 14–40" },
+  { lesson:209, date:'2026-10-30', day:'Friday',    portion:"Surah al-'Ankabut 41–52" },
+  { lesson:210, date:'2026-10-31', day:'Saturday',  portion:"Surah al-'Ankabut 53–69" },
+  // WEEK 32
+  { lesson:211, date:'2026-11-01', day:'Sunday',    portion:"Surah al-Rum 1–19" },
+  { lesson:212, date:'2026-11-02', day:'Monday',    portion:"Surah al-Rum 20–32" },
+  { lesson:213, date:'2026-11-03', day:'Tuesday',   portion:"Surah al-Rum 33–45" },
+  { lesson:214, date:'2026-11-04', day:'Wednesday', portion:"Surah al-Rum 46–60" },
+  { lesson:215, date:'2026-11-05', day:'Thursday',  portion:"Surah Luqman 1–19" },
+  { lesson:216, date:'2026-11-06', day:'Friday',    portion:"Surah Luqman 20–34" },
+  { lesson:217, date:'2026-11-07', day:'Saturday',  portion:"Surah al-Sajdah 1–30" },
+  // WEEK 33
+  { lesson:218, date:'2026-11-08', day:'Sunday',    portion:"Surah al-Ahzab 1–8" },
+  { lesson:219, date:'2026-11-09', day:'Monday',    portion:"Surah al-Ahzab 9–27" },
+  { lesson:220, date:'2026-11-10', day:'Tuesday',   portion:"Surah al-Ahzab 28–40" },
+  { lesson:221, date:'2026-11-11', day:'Wednesday', portion:"Surah al-Ahzab 41–56" },
+  { lesson:222, date:'2026-11-12', day:'Thursday',  portion:"Surah al-Ahzab 57–73" },
+  { lesson:223, date:'2026-11-13', day:'Friday',    portion:"Surah Saba' 1–9" },
+  { lesson:224, date:'2026-11-14', day:'Saturday',  portion:"Surah Saba' 10–19" },
+  // WEEK 34
+  { lesson:225, date:'2026-11-15', day:'Sunday',    portion:"Surah Saba' 20–42" },
+  { lesson:226, date:'2026-11-16', day:'Monday',    portion:"Surah Saba' 43–54" },
+  { lesson:227, date:'2026-11-17', day:'Tuesday',   portion:"Surah al-Fatir 1–14" },
+  { lesson:228, date:'2026-11-18', day:'Wednesday', portion:"Surah al-Fatir 15–37" },
+  { lesson:229, date:'2026-11-19', day:'Thursday',  portion:"Surah al-Fatir 38–45" },
+  { lesson:230, date:'2026-11-20', day:'Friday',    portion:"Surah Yasin 1–32" },
+  { lesson:231, date:'2026-11-21', day:'Saturday',  portion:"Surah Yasin 33–47" },
+  // WEEK 35 — Q4
+  { lesson:232, date:'2026-11-22', day:'Sunday',    portion:"Surah Yasin 48–83" },
+  { lesson:233, date:'2026-11-23', day:'Monday',    portion:"Surah al-Saffat 1–70" },
+  { lesson:234, date:'2026-11-24', day:'Tuesday',   portion:"Surah al-Saffat 71–113" },
+  { lesson:235, date:'2026-11-25', day:'Wednesday', portion:"Surah al-Saffat 114–148" },
+  { lesson:236, date:'2026-11-26', day:'Thursday',  portion:"Surah al-Saffat 149–182" },
+  { lesson:237, date:'2026-11-27', day:'Friday',    portion:"Surah Saad 1–29" },
+  { lesson:238, date:'2026-11-28', day:'Saturday',  portion:"Surah Saad 30–40" },
+  // WEEK 36
+  { lesson:239, date:'2026-11-29', day:'Sunday',    portion:"Surah Saad 41–88" },
+  { lesson:240, date:'2026-11-30', day:'Monday',    portion:"Surah al-Zumar 1–20" },
+  { lesson:241, date:'2026-12-01', day:'Tuesday',   portion:"Surah al-Zumar 21–31" },
+  { lesson:242, date:'2026-12-02', day:'Wednesday', portion:"Surah al-Zumar 32–52" },
+  { lesson:243, date:'2026-12-03', day:'Thursday',  portion:"Surah al-Zumar 53–75" },
+  { lesson:244, date:'2026-12-04', day:'Friday',    portion:"Surah Ghafir 1–22" },
+  { lesson:245, date:'2026-12-05', day:'Saturday',  portion:"Surah Ghafir 23–55" },
+  // WEEK 37
+  { lesson:246, date:'2026-12-06', day:'Sunday',    portion:"Surah Ghafir 56–75" },
+  { lesson:247, date:'2026-12-07', day:'Monday',    portion:"Surah Fussilat 1–18" },
+  { lesson:248, date:'2026-12-08', day:'Tuesday',   portion:"Surah Fussilat 19–32" },
+  { lesson:249, date:'2026-12-09', day:'Wednesday', portion:"Surah Fussilat 33–54" },
+  { lesson:250, date:'2026-12-10', day:'Thursday',  portion:"Surah al-Shura 1–26" },
+  { lesson:251, date:'2026-12-11', day:'Friday',    portion:"Surah al-Shura 27–52" },
+  { lesson:252, date:'2026-12-12', day:'Saturday',  portion:"Surah al-Zukhruf 1–25" },
+  // WEEK 38
+  { lesson:253, date:'2026-12-13', day:'Sunday',    portion:"Surah al-Zukhruf 26–45" },
+  { lesson:254, date:'2026-12-14', day:'Monday',    portion:"Surah al-Zukhruf 46–89" },
+  { lesson:255, date:'2026-12-15', day:'Tuesday',   portion:"Surah al-Dukhan 1–33" },
+  { lesson:256, date:'2026-12-16', day:'Wednesday', portion:"Surah al-Dukhan 34–59" },
+  { lesson:257, date:'2026-12-17', day:'Thursday',  portion:"Surah al-Jathiyah 1–15" },
+  { lesson:258, date:'2026-12-18', day:'Friday',    portion:"Surah al-Jathiyah 16–37" },
+  { lesson:259, date:'2026-12-19', day:'Saturday',  portion:"Surah al-Ahqaf 1–20" },
+  // WEEK 39
+  { lesson:260, date:'2026-12-20', day:'Sunday',    portion:"Surah al-Ahqaf 21–35" },
+  { lesson:261, date:'2026-12-21', day:'Monday',    portion:"Surah Muhammad 1–19" },
+  { lesson:262, date:'2026-12-22', day:'Tuesday',   portion:"Surah Muhammad 20–32" },
+  { lesson:263, date:'2026-12-23', day:'Wednesday', portion:"Surah al-Fath 1–17" },
+  { lesson:264, date:'2026-12-24', day:'Thursday',  portion:"Surah al-Fath 18–29" },
+  { lesson:265, date:'2026-12-25', day:'Friday',    portion:"Surah al-Hujurat 1–10" },
+  { lesson:266, date:'2026-12-26', day:'Saturday',  portion:"Surah al-Hujurat 11–18" },
+  // WEEK 40
+  { lesson:267, date:'2026-12-27', day:'Sunday',    portion:"Surah Qaaf" },
+  { lesson:268, date:'2026-12-28', day:'Monday',    portion:"Surah al-Dhariyat" },
+  { lesson:269, date:'2026-12-29', day:'Tuesday',   portion:"Surah al-Tur" },
+  { lesson:270, date:'2026-12-30', day:'Wednesday', portion:"Surah al-Najm" },
+  { lesson:271, date:'2026-12-31', day:'Thursday',  portion:"Surah al-Qamar" },
+  { lesson:272, date:'2027-01-01', day:'Friday',    portion:"Surah al-Rahman" },
+  { lesson:273, date:'2027-01-02', day:'Saturday',  portion:"Surah al-Waqi'ah 1–74" },
+  // WEEK 41
+  { lesson:274, date:'2027-01-03', day:'Sunday',    portion:"Surah al-Waqi'ah 75–96" },
+  { lesson:275, date:'2027-01-04', day:'Monday',    portion:"Surah al-Hadid 1–19" },
+  { lesson:276, date:'2027-01-05', day:'Tuesday',   portion:"Surah al-Hadid 20–29" },
+  { lesson:277, date:'2027-01-06', day:'Wednesday', portion:"Surah al-Mujadilah" },
+  { lesson:278, date:'2027-01-07', day:'Thursday',  portion:"Surah al-Hashr" },
+  { lesson:279, date:'2027-01-08', day:'Friday',    portion:"Surah al-Mumtahinah" },
+  { lesson:280, date:'2027-01-09', day:'Saturday',  portion:"Surah al-Saff" },
+  // WEEK 42
+  { lesson:281, date:'2027-01-10', day:'Sunday',    portion:"Surah al-Jumu'ah" },
+  { lesson:282, date:'2027-01-11', day:'Monday',    portion:"Surah al-Munafiqoon" },
+  { lesson:283, date:'2027-01-12', day:'Tuesday',   portion:"Surah al-Taghabun" },
+  { lesson:284, date:'2027-01-13', day:'Wednesday', portion:"Surah al-Talaq" },
+  { lesson:285, date:'2027-01-14', day:'Thursday',  portion:"Surah al-Tahrim" },
+  { lesson:286, date:'2027-01-15', day:'Friday',    portion:"Surah al-Mulk" },
+  { lesson:287, date:'2027-01-16', day:'Saturday',  portion:"Surah al-Qalam" },
+  // WEEK 43
+  { lesson:288, date:'2027-01-17', day:'Sunday',    portion:"Surah al-Haqqah" },
+  { lesson:289, date:'2027-01-18', day:'Monday',    portion:"Surah al-Ma'arij" },
+  { lesson:290, date:'2027-01-19', day:'Tuesday',   portion:"Surah Nuh" },
+  { lesson:291, date:'2027-01-20', day:'Wednesday', portion:"Surah al-Jinn" },
+  { lesson:292, date:'2027-01-21', day:'Thursday',  portion:"Surah al-Muzzammil" },
+  { lesson:293, date:'2027-01-22', day:'Friday',    portion:"Surah al-Muddathir" },
+  { lesson:294, date:'2027-01-23', day:'Saturday',  portion:"Surah al-Qiyamah" },
+  // WEEK 44
+  { lesson:295, date:'2027-01-24', day:'Sunday',    portion:"Surah al-Insan" },
+  { lesson:296, date:'2027-01-25', day:'Monday',    portion:"Surah al-Mursalat" },
+  { lesson:297, date:'2027-01-26', day:'Tuesday',   portion:"Surah al-Naba'" },
+  { lesson:298, date:'2027-01-27', day:'Wednesday', portion:"Surah al-Nazi'at" },
+  { lesson:299, date:'2027-01-28', day:'Thursday',  portion:"Surahs 'Abasa & al-Takwir" },
+  { lesson:300, date:'2027-01-29', day:'Friday',    portion:"Surahs al-Infitar & al-Mutaffifin" },
+  { lesson:301, date:'2027-01-30', day:'Saturday',  portion:"Surahs al-Inshiqaq & al-Burooj" },
+  // WEEK 45
+  { lesson:302, date:'2027-01-31', day:'Sunday',    portion:"Surahs al-Tariq – al-Ghashiyah" },
+  { lesson:303, date:'2027-02-01', day:'Monday',    portion:"Surahs al-Fajr & al-Balad" },
+  { lesson:304, date:'2027-02-02', day:'Tuesday',   portion:"Surahs al-Shams – al-Sharh" },
+  { lesson:305, date:'2027-02-03', day:'Wednesday', portion:"Surahs al-Teen – al-Bayyinah" },
+  { lesson:306, date:'2027-02-04', day:'Thursday',  portion:"Surahs al-Zalzalah – al-Takathur" },
+  { lesson:307, date:'2027-02-05', day:'Friday',    portion:"Surahs al-'Asr – al-Kawthar" },
+  { lesson:308, date:'2027-02-06', day:'Saturday',  portion:"Surahs al-Kafiroon – al-Nas" },
+];
+
+// Week groupings (lesson numbers)
+const WEEKS = [
+  { num:1,  q:'First Quarter', lessons:[1,7] },
+  { num:2,  q:'First Quarter', lessons:[8,14] },
+  { num:3,  q:'First Quarter', lessons:[15,21] },
+  { num:4,  q:'First Quarter', lessons:[22,28] },
+  { num:5,  q:'First Quarter', lessons:[29,35] },
+  { num:6,  q:'First Quarter', lessons:[36,42] },
+  { num:7,  q:'First Quarter', lessons:[43,49] },
+  { num:8,  q:'First Quarter', lessons:[50,56] },
+  { num:9,  q:'First Quarter', lessons:null, eid:true },
+  { num:10, q:'First Quarter', lessons:[57,63] },
+  { num:11, q:'First Quarter', lessons:[64,70] },
+  { num:12, q:'First Quarter', lessons:[71,77] },
+  { num:13, q:'Second Quarter', lessons:[78,84] },
+  { num:14, q:'Second Quarter', lessons:[85,91] },
+  { num:15, q:'Second Quarter', lessons:[92,98] },
+  { num:16, q:'Second Quarter', lessons:[99,105] },
+  { num:17, q:'Second Quarter', lessons:[106,112] },
+  { num:18, q:'Second Quarter', lessons:[113,119] },
+  { num:19, q:'Second Quarter', lessons:[120,126] },
+  { num:20, q:'Second Quarter', lessons:[127,133] },
+  { num:21, q:'Second Quarter', lessons:[134,140] },
+  { num:22, q:'Second Quarter', lessons:[141,147] },
+  { num:23, q:'Second Quarter', lessons:[148,154] },
+  { num:24, q:'Third Quarter', lessons:[155,161] },
+  { num:25, q:'Third Quarter', lessons:[162,168] },
+  { num:26, q:'Third Quarter', lessons:[169,175] },
+  { num:27, q:'Third Quarter', lessons:[176,182] },
+  { num:28, q:'Third Quarter', lessons:[183,189] },
+  { num:29, q:'Third Quarter', lessons:[190,196] },
+  { num:30, q:'Third Quarter', lessons:[197,203] },
+  { num:31, q:'Third Quarter', lessons:[204,210] },
+  { num:32, q:'Third Quarter', lessons:[211,217] },
+  { num:33, q:'Third Quarter', lessons:[218,224] },
+  { num:34, q:'Third Quarter', lessons:[225,231] },
+  { num:35, q:'Fourth Quarter', lessons:[232,238] },
+  { num:36, q:'Fourth Quarter', lessons:[239,245] },
+  { num:37, q:'Fourth Quarter', lessons:[246,252] },
+  { num:38, q:'Fourth Quarter', lessons:[253,259] },
+  { num:39, q:'Fourth Quarter', lessons:[260,266] },
+  { num:40, q:'Fourth Quarter', lessons:[267,273] },
+  { num:41, q:'Fourth Quarter', lessons:[274,280] },
+  { num:42, q:'Fourth Quarter', lessons:[281,287] },
+  { num:43, q:'Fourth Quarter', lessons:[288,294] },
+  { num:44, q:'Fourth Quarter', lessons:[295,301] },
+  { num:45, q:'Fourth Quarter', lessons:[302,308] },
+];
+
+const TASKS = [
+  { key:'mushaf', icon:'📖', label:'Recite from Mushaf' },
+  { key:'translation', icon:'🌐', label:'Read Translation' },
+  { key:'tafsir', icon:'✍️', label:'Read Tafsir' },
+];
+
+const STORAGE_KEY = 'quran_schedule_v1';
+
+// ─── STATE ────────────────────────────────────────────────────────────────────
+let state = {}; // { 'lesson_1_mushaf': true, ... }
+let currentWeekIndex = 0;
+
+function loadState() {
+  try {
+    const s = localStorage.getItem(STORAGE_KEY);
+    if (s) state = JSON.parse(s);
+  } catch(e) { state = {}; }
+}
+
+function saveState() {
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch(e) {}
+}
+
+function toggleTask(lessonNum, taskKey) {
+  const k = `lesson_${lessonNum}_${taskKey}`;
+  state[k] = !state[k];
+  saveState();
+  renderWeek();
+  updateProgress();
+}
+
+function isChecked(lessonNum, taskKey) {
+  return !!state[`lesson_${lessonNum}_${taskKey}`];
+}
+
+// ─── DATE UTILS ───────────────────────────────────────────────────────────────
+function todayStr() {
+  const d = new Date();
+  const y = d.getFullYear();
+  const m = String(d.getMonth()+1).padStart(2,'0');
+  const day = String(d.getDate()).padStart(2,'0');
+  return `${y}-${m}-${day}`;
+}
+
+function findTodayWeekIndex() {
+  const today = todayStr();
+  for (let wi = 0; wi < WEEKS.length; wi++) {
+    const w = WEEKS[wi];
+    if (w.eid) continue;
+    const [s, e] = w.lessons;
+    const days = SCHEDULE.filter(l => l.lesson >= s && l.lesson <= e);
+    if (days.some(l => l.date === today)) return wi;
+  }
+  // If before schedule, show week 1; if after, show last
+  if (today < SCHEDULE[0].date) return 0;
+  return WEEKS.length - 1;
+}
+
+function formatDate(dateStr) {
+  const [y, m, d] = dateStr.split('-').map(Number);
+  const date = new Date(y, m-1, d);
+  return date.toLocaleDateString('en-US', { month:'short', day:'numeric' });
+}
+
+// ─── PROGRESS ─────────────────────────────────────────────────────────────────
+function updateProgress() {
+  const total = SCHEDULE.length * 3;
+  let done = 0;
+  SCHEDULE.forEach(l => {
+    TASKS.forEach(t => { if (isChecked(l.lesson, t.key)) done++; });
+  });
+  document.getElementById('progressCount').textContent = `${done} / ${total} tasks`;
+  document.getElementById('progressFill').style.width = `${(done/total)*100}%`;
+}
+
+// ─── RENDER ───────────────────────────────────────────────────────────────────
+function ordinal(n) {
+  if (n===1) return 'One'; if (n===2) return 'Two'; if (n===3) return 'Three';
+  if (n===4) return 'Four'; if (n===5) return 'Five'; if (n===6) return 'Six';
+  if (n===7) return 'Seven'; if (n===8) return 'Eight'; if (n===9) return 'Nine';
+  if (n===10) return 'Ten';
+  const s = ['th','st','nd','rd'], v=n%100;
+  return n + (s[(v-20)%10]||s[v]||s[0]);
+}
+
+function renderWeek() {
+  const week = WEEKS[currentWeekIndex];
+  const today = todayStr();
+  const container = document.getElementById('weekContainer');
+
+  // nav label
+  document.getElementById('weekLabel').textContent = `Week ${ordinal(week.num)}`;
+
+  // update nav buttons
+  document.getElementById('prevBtn').disabled = currentWeekIndex === 0;
+  document.getElementById('nextBtn').disabled = currentWeekIndex === WEEKS.length - 1;
+
+  let html = `
+    <div class="week-header">
+      <div class="week-title">Week ${ordinal(week.num)}</div>
+      <span class="quarter-badge">${week.q}</span>
+    </div>
+  `;
+
+  if (week.eid) {
+    html += `
+      <div class="eid-break">
+        <h3>عيد مبارك</h3>
+        <p>'Eid Break — May 24–30</p>
+      </div>
+    `;
+  } else {
+    const [s, e] = week.lessons;
+    const days = SCHEDULE.filter(l => l.lesson >= s && l.lesson <= e);
+
+    days.forEach(lesson => {
+      const isToday = lesson.date === today;
+      const allDone = TASKS.every(t => isChecked(lesson.lesson, t.key));
+      const doneCount = TASKS.filter(t => isChecked(lesson.lesson, t.key)).length;
+
+      html += `<div class="day-card${isToday ? ' is-today' : ''}${allDone ? ' all-done' : ''}" id="card_${lesson.lesson}">
+        <div class="day-header">
+          <div class="day-meta">
+            <div class="day-name-row">
+              ${isToday ? '<div class="today-dot"></div>' : ''}
+              <span class="day-name">${lesson.day}, ${formatDate(lesson.date)}</span>
+            </div>
+            <div class="lesson-num">Lesson ${lesson.lesson}</div>
+            <div class="reading-portion">${lesson.portion}</div>
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:flex-end;gap:0.35rem;">
+            ${allDone ? '<span class="done-badge">✓ Done</span>' : ''}
+            <div class="task-dots">
+              ${TASKS.map(t => `<div class="task-dot${isChecked(lesson.lesson, t.key) ? ' filled' : ''}"></div>`).join('')}
+            </div>
+          </div>
+        </div>
+        <div class="tasks">
+          ${TASKS.map(t => `
+            <div class="task-row${isChecked(lesson.lesson, t.key) ? ' checked' : ''}"
+                 onclick="toggleTask(${lesson.lesson}, '${t.key}')">
+              <div class="task-check">
+                <svg class="check-icon" viewBox="0 0 10 10" fill="none">
+                  <path d="M1.5 5L4 7.5L8.5 2.5" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </div>
+              <span class="task-icon">${t.icon}</span>
+              <span class="task-label">${t.label}</span>
+            </div>
+          `).join('')}
+        </div>
+      </div>`;
+    });
+  }
+
+  container.innerHTML = html;
+
+  // Scroll to today card if on current week
+  if (week.lessons) {
+    const [s, e] = week.lessons;
+    const todayLesson = SCHEDULE.find(l => l.date === today && l.lesson >= s && l.lesson <= e);
+    if (todayLesson) {
+      requestAnimationFrame(() => {
+        const card = document.getElementById(`card_${todayLesson.lesson}`);
+        if (card) card.scrollIntoView({ behavior:'smooth', block:'center' });
+      });
+    }
+  }
+}
+
+function changeWeek(dir) {
+  const newIdx = currentWeekIndex + dir;
+  if (newIdx < 0 || newIdx >= WEEKS.length) return;
+  currentWeekIndex = newIdx;
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+  renderWeek();
+}
+
+function goToToday() {
+  const todayWeekIdx = findTodayWeekIndex();
+  if (currentWeekIndex !== todayWeekIdx) {
+    currentWeekIndex = todayWeekIdx;
+    renderWeek();
+  }
+  const today = todayStr();
+  const lesson = SCHEDULE.find(l => l.date === today);
+  if (lesson) {
+    setTimeout(() => {
+      const card = document.getElementById(`card_${lesson.lesson}`);
+      if (card) card.scrollIntoView({ behavior:'smooth', block:'center' });
+    }, 100);
+  }
+}
+
+// Float today button visibility
+function checkFloatBtn() {
+  const today = todayStr();
+  const todayLesson = SCHEDULE.find(l => l.date === today);
+  if (!todayLesson) return;
+  const card = document.getElementById(`card_${todayLesson.lesson}`);
+  const btn = document.getElementById('floatToday');
+  const scrollTop = document.getElementById('scrollTop');
+  if (!card) {
+    btn.classList.add('visible');
+  } else {
+    const rect = card.getBoundingClientRect();
+    btn.classList.toggle('visible', rect.top > window.innerHeight || rect.bottom < 0);
+  }
+  scrollTop.classList.toggle('visible', window.scrollY > 300);
+}
+
+// ─── INIT ─────────────────────────────────────────────────────────────────────
+loadState();
+currentWeekIndex = findTodayWeekIndex();
+renderWeek();
+updateProgress();
+
+window.addEventListener('scroll', checkFloatBtn, { passive: true });
+checkFloatBtn();
+</script>
+</body>
+</html>
